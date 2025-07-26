@@ -1,0 +1,87 @@
+{
+  "diagnosis": {
+    "name": "桥本甲状腺炎",
+    "type": "thyroid",
+    "icon": "🏥",
+    "color": "#e17055",
+    "sort": 300
+  },
+  "testInfo": {
+    "date": "2024-12-07",
+    "time": "09:05",
+    "method": "罗氏电化学发光法",
+    "institution": "医院检验科"
+  },
+  "results": [
+    {
+      "name": "促甲状腺激素 (TSH)",
+      "value": "3.000",
+      "unit": "uIU/mL",
+      "status": "正常",
+      "reference": "0.75 - 5.60",
+      "isNormal": true
+    },
+    {
+      "name": "游离甲状腺素 (FT4)",
+      "value": "15.600",
+      "unit": "pmol/L",
+      "status": "正常",
+      "reference": "12.8 - 21.3",
+      "isNormal": true
+    },
+    {
+      "name": "游离三碘甲状腺原氨酸 (FT3)",
+      "value": "5.710",
+      "unit": "pmol/L",
+      "status": "正常",
+      "reference": "3.10 - 6.80",
+      "isNormal": true
+    },
+    {
+      "name": "抗甲状腺球蛋白抗体 (TGAb)",
+      "value": "1356.00",
+      "unit": "IU/mL",
+      "status": "偏高",
+      "reference": "0 - 115",
+      "isNormal": false
+    },
+    {
+      "name": "抗甲状腺过氧化物酶抗体 (TPOAb)",
+      "value": "391.00",
+      "unit": "IU/mL",
+      "status": "偏高",
+      "reference": "0 - 34",
+      "isNormal": false
+    }
+  ],
+  "trendData": {
+    "labels": ["2024-12-07", "2025-01-25", "未来复查1", "未来复查2"],
+    "datasets": [
+      {
+        "name": "TSH (uIU/mL)",
+        "data": [3.0, 3.1, null, null],
+        "color": "#fd79a8"
+      },
+      {
+        "name": "FT4 (pmol/L)",
+        "data": [15.6, 15.8, null, null],
+        "color": "#74b9ff"
+      },
+      {
+        "name": "FT3 (pmol/L)",
+        "data": [5.71, 5.65, null, null],
+        "color": "#00b894"
+      }
+    ]
+  },
+  "recommendations": {
+    "diagnosis": "桥本甲状腺炎是一种自身免疫性甲状腺疾病，目前甲状腺功能指标 (TSH、FT4、FT3) 均在正常范围内，但抗体水平显著升高，需要定期监测。",
+    "treatment": "暂时无需药物治疗，建议每3-6个月复查甲状腺功能，注意观察症状变化。",
+    "lifestyle": [
+      "保持规律作息，避免过度疲劳和压力",
+      "适量摄入碘，避免高碘食物",
+      "坚持适度运动，增强免疫力",
+      "定期复查，关注甲状腺功能变化"
+    ]
+  }
+}

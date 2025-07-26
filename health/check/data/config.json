@@ -1,0 +1,49 @@
+{
+  "activeTests": ["allergy", "thyroid", "blood"],
+  "availableTests": {
+    "thyroid": {
+      "name": "甲状腺功能",
+      "dataFile": "thyroid.json",
+      "hasChart": true,
+      "order": 2
+    },
+    "allergy": {
+      "name": "过敏原检测",
+      "dataFile": "allergy.json",
+      "hasChart": false,
+      "order": 1
+    },
+    "blood": {
+      "name": "血常规",
+      "dataFile": "blood.json",
+      "hasChart": false,
+      "order": 3
+    },
+    "liver": {
+      "name": "肝功能",
+      "dataFile": "liver.json",
+      "hasChart": false,
+      "order": 4
+    },
+    "kidney": {
+      "name": "肾功能",
+      "dataFile": "kidney.json",
+      "hasChart": false,
+      "order": 5
+    }
+  },
+  "patientInfo": {
+    "name": "Eve",
+    "lastUpdate": "2025-01-25",
+    "institution": "医院检验科",
+    "doctors": "内分泌科/过敏科"
+  },
+  "followUpSchedule": {
+    "thyroid": "每3-6个月复查一次",
+    "allergy": "根据季节和症状变化灵活调整检查频率",
+    "blood": "每年体检时检查",
+    "liver": "每6个月检查一次",
+    "kidney": "每年检查一次"
+  },
+  "generalNotes": "请根据医生建议定期复查各项指标，如有异常及时就医。"
+}

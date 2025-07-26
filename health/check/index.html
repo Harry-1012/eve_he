@@ -1,0 +1,1115 @@
+<!DOCTYPE html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Eve健康档案 - 综合健康监测</title><link rel=icon type=image/x-icon href=../../res/img/eveac.ico><!-- 引入通用样式 --><link rel=stylesheet href=../common/eve-common.css><style>
+        /* 导航栏样式 */
+        .health-nav {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 0 0 20px 20px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 15px;
+            background: rgba(255, 182, 193, 0.1);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            color: #e17055;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 182, 193, 0.2);
+            border-color: rgba(255, 182, 193, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+        }
+
+        .nav-item .icon {
+            font-size: 16px;
+        }
+
+        /* 搜索功能样式 */
+        .search-container {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+            border-left: 1px solid rgba(255, 182, 193, 0.3);
+            padding-left: 15px;
+        }
+
+        .search-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 182, 193, 0.1);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            color: #e17055;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .search-toggle:hover {
+            background: rgba(255, 182, 193, 0.2);
+            border-color: rgba(255, 182, 193, 0.5);
+            transform: scale(1.1);
+        }
+
+        .search-input-container {
+            display: none;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .search-input-container.active {
+            display: block;
+            animation: expandSearch 0.3s ease;
+        }
+
+        .search-input {
+            width: 200px;
+            padding: 8px 35px 8px 12px;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: rgba(255, 182, 193, 0.6);
+            box-shadow: 0 0 0 2px rgba(255, 182, 193, 0.2);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-clear:hover {
+            color: #e17055;
+        }
+
+        @keyframes expandSearch {
+            from {
+                opacity: 0;
+                transform: scaleX(0);
+            }
+            to {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        /* 高亮搜索结果 */
+        .search-highlight {
+            background: rgba(255, 235, 59, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* 隐藏不匹配的测试卡片 */
+        .eve-card.search-hidden {
+            display: none;
+        }
+
+        /* 页面特定样式 */
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #74b9ff;
+        }
+
+        .header-meta span {
+            background: rgba(116, 185, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(116, 185, 255, 0.2);
+        }
+
+        .diagnosis-title {
+            color: #e17055;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .diagnosis-title::before {
+            content: "🏥";
+            font-size: 28px;
+        }
+
+        .allergy-title {
+            color: #00b894;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .allergy-title::before {
+            content: "🌿";
+            font-size: 28px;
+        }
+
+        .test-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0984e3;
+        }
+
+        .chart-title {
+            color: #d63384;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-title::before {
+            content: "📈";
+            font-size: 24px;
+        }
+
+        #thyroidChart {
+            max-height: 400px;
+            margin: 20px 0;
+        }
+
+        .medication-item {
+            background: rgba(0, 184, 148, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #00b894;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .medication-item::before {
+            content: "💊";
+            font-size: 18px;
+        }
+
+        .notes-title {
+            color: #74b9ff;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notes-title::before {
+            content: "📝";
+            font-size: 24px;
+        }
+
+        .footer-info {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* PC端eve-container上边距 */
+        .eve-container {
+            margin-top: 75px;
+        }
+
+        @media (max-width: 768px) {
+            /* 移动端重置eve-container上边距 */
+            .eve-container {
+                margin-top: 0;
+            }
+            
+            .header-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            /* 移动端导航栏样式 */
+            .health-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                transform: none;
+                width: 100%;
+                padding: 8px 10px;
+                border-radius: 0;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 8px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                box-sizing: border-box;
+                /* 隐藏滚动条但保持滚动功能 */
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE/Edge */
+            }
+            
+            /* 隐藏滚动条 - WebKit browsers */
+            .health-nav::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-item {
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 12px;
+                gap: 5px;
+                flex-shrink: 0;
+                white-space: nowrap;
+                min-width: calc((100vw - 120px) / 3); /* 最多显示3个 */
+                max-width: calc((100vw - 120px) / 3);
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .nav-item .icon {
+                font-size: 14px;
+            }
+            
+            .search-container {
+                margin-left: 8px;
+                padding-left: 8px;
+                border-left: 1px solid rgba(255, 182, 193, 0.3);
+                flex-shrink: 0;
+            }
+            
+            .search-toggle {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .search-input-container.active {
+                position: absolute;
+                top: 100%;
+                left: 10px;
+                right: 10px;
+                margin: 5px 0;
+                z-index: 1001;
+            }
+            
+            .search-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* 移动端返回按钮调整 */
+            .eve-back-button {
+                top: 100px !important; /* 往下移动更多 */
+                z-index: 999;
+                left: 20px !important;
+                padding: 6px 12px !important; /* 减小按钮尺寸 */
+                font-size: 12px !important; /* 减小字体 */
+                border-radius: 12px !important; /* 相应调整圆角 */
+                min-width: auto !important; /* 取消最小宽度 */
+                margin-top: 100px;
+            }
+            
+        }
+        
+        @media (max-width: 480px) {
+            .health-nav {
+                padding: 6px 8px;
+                gap: 6px;
+            }
+            
+            .nav-item {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+            
+            .nav-item .icon {
+                font-size: 12px;
+            }
+            
+            .search-toggle {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+    </style></head><body class=eve-background><!-- 导航栏 --><nav class=health-nav id=healthNav><!-- 通过JavaScript动态生成导航项 --></nav><a href=../ class="eve-button eve-back-button">返回健康中心</a><!-- 返回顶部按钮 --><button class=back-to-top id=backToTop title=返回顶部> ↑ </button><div class=eve-container><!-- 页面头部 --><div class=eve-card><h1 class="eve-title eve-title-large eve-title-with-flowers">Eve健康档案</h1><div class=header-meta><!-- 通过JavaScript动态加载 --></div></div><!-- 过敏原检测卡片 --><div class=eve-card><!-- 通过JavaScript动态加载 --></div><!-- 甲状腺检测卡片 --><div class=eve-card><!-- 通过JavaScript动态加载 --></div><!-- 数据图表 --><div class=eve-card><h3 class=chart-title>甲状腺功能趋势图</h3><canvas id=thyroidChart></canvas></div><!-- 医生建议和注意事项 --><div class=eve-card><!-- 通过JavaScript动态加载 --></div><!-- 页面底部信息 --><div class=footer-info><p>💖 健康是最宝贵的财富，愿你永远健康美丽 💖</p><p>本档案仅供个人健康管理使用 | 生成时间: 2025年7月25日</p></div></div><!-- Chart.js 库 --><script src=https://cdn.bootcdn.net/ajax/libs/Chart.js/3.9.1/chart.min.js></script><script>
+        // 存储数据的全局变量
+        let configData = {};
+        let testsData = {};
+
+        // 加载JSON数据
+        async function loadData() {
+            try {
+                // 首先加载配置文件
+                const configResponse = await fetch('./data/config.json');
+                if (!configResponse.ok) {
+                    throw new Error(`配置文件加载失败: ${configResponse.status}`);
+                }
+                configData = await configResponse.json();
+
+                // 验证配置数据
+                if (!configData.activeTests || !Array.isArray(configData.activeTests)) {
+                    throw new Error('配置文件中缺少activeTests数组');
+                }
+                if (!configData.availableTests || typeof configData.availableTests !== 'object') {
+                    throw new Error('配置文件中缺少availableTests对象');
+                }
+
+                // 根据配置加载活跃的检测数据
+                const loadPromises = configData.activeTests.map(async testType => {
+                    try {
+                        const testConfig = configData.availableTests[testType];
+                        if (!testConfig || !testConfig.dataFile) {
+                            console.warn(`检测类型 ${testType} 的配置不完整`);
+                            return;
+                        }
+
+                        const response = await fetch(`./data/${testConfig.dataFile}`);
+                        if (!response.ok) {
+                            console.warn(`数据文件 ${testConfig.dataFile} 加载失败: ${response.status}`);
+                            return;
+                        }
+
+                        const data = await response.json();
+                        testsData[testType] = data;
+                        console.log(`成功加载 ${testType} 数据`);
+                    } catch (error) {
+                        console.error(`加载 ${testType} 数据时出错:`, error);
+                    }
+                });
+
+                await Promise.all(loadPromises);
+
+                // 检查是否至少加载了一个检测数据
+                if (Object.keys(testsData).length === 0) {
+                    throw new Error('没有成功加载任何检测数据');
+                }
+
+                // 数据加载完成后渲染页面
+                renderPage();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                // 如果加载失败，显示错误信息
+                document.querySelector('.eve-container').innerHTML = `
+                    <div class="eve-card">
+                        <h2 style="color: #e74c3c; text-align: center;">⚠️ 数据加载失败</h2>
+                        <p style="text-align: center;">错误信息: ${error.message}</p>
+                        <p style="text-align: center;">请检查数据文件是否存在或网络连接</p>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button onclick="location.reload()" class="eve-button">重新加载</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 渲染页面内容
+        function renderPage() {
+            renderHeader();
+            renderNavigation();
+            renderTestSections();
+            renderChart();
+            renderRecommendations();
+        }
+
+        // 渲染页面头部
+        function renderHeader() {
+            try {
+                const headerMetaDiv = document.querySelector('.header-meta');
+                if (!headerMetaDiv) {
+                    console.error('找不到header-meta元素');
+                    return;
+                }
+
+                const patientInfo = configData.patientInfo || {};
+                headerMetaDiv.innerHTML = `
+                    <span>🗓️ 最后更新: ${patientInfo.lastUpdate || '未知'}</span>
+                    <span>📍 检验机构: ${patientInfo.institution || '未知'}</span>
+                    <span>👩‍⚕️ 主治医师: ${patientInfo.doctors || '未知'}</span>
+                `;
+            } catch (error) {
+                console.error('渲染头部时出错:', error);
+            }
+        }
+
+        // 渲染导航栏
+        function renderNavigation() {
+            try {
+                const navElement = document.getElementById('healthNav');
+                if (!navElement) {
+                    console.error('找不到healthNav元素');
+                    return;
+                }
+
+                // 按sort值排序，与测试卡片顺序一致
+                const sortedTests = configData.activeTests.sort((a, b) => {
+                    const sortA = testsData[a]?.diagnosis?.sort || 0;
+                    const sortB = testsData[b]?.diagnosis?.sort || 0;
+                    return sortB - sortA;
+                });
+
+                const navItems = sortedTests.map(testType => {
+                    const testData = testsData[testType];
+                    if (!testData) return '';
+                    
+                    const { name, icon, color } = testData.diagnosis;
+                    return `
+                        <a href="#test-${testType}" class="nav-item" style="color: ${color};" onclick="smoothScrollTo('test-${testType}')">
+                            <span class="icon">${icon}</span>
+                            <span>${name}</span>
+                        </a>
+                    `;
+                }).join('');
+
+                const searchComponent = `
+                    <div class="search-container">
+                        <div class="search-toggle" onclick="toggleSearch()" title="搜索诊断">
+                            🔍
+                        </div>
+                        <div class="search-input-container" id="searchInputContainer">
+                            <input type="text" class="search-input" id="searchInput" placeholder="搜索诊断名称..." 
+                                   oninput="performSearch()" onkeyup="handleSearchKeyup(event)">
+                            <button class="search-clear" onclick="clearSearch()" title="清除搜索">×</button>
+                        </div>
+                    </div>
+                `;
+
+                navElement.innerHTML = navItems + searchComponent;
+            } catch (error) {
+                console.error('渲染导航栏时出错:', error);
+            }
+        }
+
+        // 平滑滚动到指定元素
+        function smoothScrollTo(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }
+        }
+
+        // 搜索功能
+        let searchExpanded = false;
+
+        function toggleSearch() {
+            const container = document.getElementById('searchInputContainer');
+            const input = document.getElementById('searchInput');
+            
+            if (!searchExpanded) {
+                container.classList.add('active');
+                setTimeout(() => input.focus(), 300);
+                searchExpanded = true;
+            } else {
+                container.classList.remove('active');
+                clearSearch();
+                searchExpanded = false;
+            }
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const testCards = document.querySelectorAll('.eve-card[id^="test-"]');
+            
+            if (!query) {
+                // 如果搜索为空，显示所有卡片
+                testCards.forEach(card => {
+                    card.classList.remove('search-hidden');
+                    removeHighlight(card);
+                });
+                return;
+            }
+
+            testCards.forEach(card => {
+                const testType = card.id.replace('test-', '');
+                const testData = testsData[testType];
+                
+                if (testData && testData.diagnosis.name.toLowerCase().includes(query)) {
+                    card.classList.remove('search-hidden');
+                    highlightText(card, testData.diagnosis.name, query);
+                } else {
+                    card.classList.add('search-hidden');
+                    removeHighlight(card);
+                }
+            });
+        }
+
+        function highlightText(card, originalText, query) {
+            // 找到卡片中的诊断标题并高亮搜索词
+            const titleElements = card.querySelectorAll('h2, .diagnosis-title, .allergy-title, .blood-title');
+            titleElements.forEach(element => {
+                if (element.textContent.includes(originalText)) {
+                    const highlightedText = originalText.replace(
+                        new RegExp(`(${query})`, 'gi'),
+                        '<span class="search-highlight">$1</span>'
+                    );
+                    element.innerHTML = element.innerHTML.replace(originalText, highlightedText);
+                }
+            });
+        }
+
+        function removeHighlight(card) {
+            const highlights = card.querySelectorAll('.search-highlight');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                parent.normalize();
+            });
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            performSearch(); // 清除搜索结果
+        }
+
+        function handleSearchKeyup(event) {
+            if (event.key === 'Escape') {
+                toggleSearch();
+            }
+        }
+
+        // 点击页面其他地方关闭搜索
+        document.addEventListener('click', function(event) {
+            const searchContainer = event.target.closest('.search-container');
+            if (!searchContainer && searchExpanded) {
+                toggleSearch();
+            }
+        });
+
+        // 渲染所有检测部分
+        function renderTestSections() {
+            try {
+                // 按sort值排序（从大到小，值越大越靠前）
+                const sortedTests = configData.activeTests.sort((a, b) => {
+                    const sortA = testsData[a]?.diagnosis?.sort || 0;
+                    const sortB = testsData[b]?.diagnosis?.sort || 0;
+                    return sortB - sortA; // 从大到小排序
+                });
+
+                // 获取容器中的卡片，跳过第一个（标题）和后两个（图表和建议）
+                const container = document.querySelector('.eve-container');
+                if (!container) {
+                    console.error('找不到eve-container元素');
+                    return;
+                }
+                
+                const cards = container.querySelectorAll('.eve-card');
+                
+                // 移除现有的检测卡片（保留标题、图表和建议卡片）
+                for (let i = cards.length - 1; i >= 1; i--) {
+                    if (i < cards.length - 2) { // 不删除最后两个卡片
+                        cards[i].remove();
+                    }
+                }
+
+                // 在标题卡片后插入新的检测卡片
+                const titleCard = cards[0];
+                let lastInsertedCard = titleCard;
+                
+                sortedTests.forEach((testType, index) => {
+                    try {
+                        const testData = testsData[testType];
+                        if (!testData) {
+                            console.warn(`${testType} 的数据不存在，跳过渲染`);
+                            return;
+                        }
+
+                        const testCard = document.createElement('div');
+                        testCard.className = 'eve-card';
+                        testCard.id = `test-${testType}`; // 为每个卡片添加ID
+                        
+                        testCard.innerHTML = renderTestCard(testData, testType);
+                        
+                        // 在上一个插入的卡片后插入，保持正确顺序
+                        lastInsertedCard.insertAdjacentElement('afterend', testCard);
+                        lastInsertedCard = testCard;
+                    } catch (error) {
+                        console.error(`渲染 ${testType} 卡片时出错:`, error);
+                    }
+                });
+            } catch (error) {
+                console.error('渲染检测部分时出错:', error);
+            }
+        }
+
+        // 渲染单个检测卡片
+        function renderTestCard(testData, testType) {
+            try {
+                if (!testData || !testData.diagnosis) {
+                    return `<div class="eve-note-item">⚠️ ${testType} 数据格式错误</div>`;
+                }
+
+                let content = `<h2 style="color: ${testData.diagnosis.color || '#666'}; font-size: 24px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 28px;">${testData.diagnosis.icon || '📋'}</span> ${testData.diagnosis.name || testType}
+                </h2>`;
+
+                // 检测信息
+                if (testData.testInfo) {
+                    content += `<div class="eve-info-box">
+                        <div class="test-date">🔬 检验时间：${testData.testInfo.date || '未知'} ${testData.testInfo.time || ''} (${testData.testInfo.method || '未知'})</div>
+                    </div>`;
+                }
+
+                // 特殊处理血信息
+                if (testData.donationInfo) {
+                    content += `<div class="eve-info-box" style="background: linear-gradient(45deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1)); border-left-color: #e74c3c;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <div><strong>🩸 血量：</strong> ${testData.donationInfo.volume || '未知'}</div>
+                            <div><strong>✅ 筛查结果：</strong> ${testData.donationInfo.status || '未知'}</div>
+                            <div><strong>🔴 血型：</strong> ${testData.donationInfo.bloodType || '未知'}</div>
+                            <div><strong>➕ Rh因子：</strong> ${testData.donationInfo.rhType || '未知'}</div>
+                        </div>
+                    </div>`;
+                }
+
+                // 检测结果表格
+                if (testData.results && Array.isArray(testData.results) && testData.results.length > 0) {
+                    if (testType === 'allergy') {
+                        content += renderAllergyTable(testData);
+                    } else {
+                        content += renderStandardTable(testData);
+                    }
+                }
+
+                // 用药信息（仅过敏检测）
+                if (testData.medications && Array.isArray(testData.medications)) {
+                    content += `<div style="margin-top: 20px;">
+                        <h4 style="color: ${testData.diagnosis.color || '#666'}; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                            <span>💊</span> 当前用药方案
+                        </h4>`;
+                    
+                    testData.medications.forEach(med => {
+                        content += `<div class="medication-item">
+                            <div>
+                                <strong>${med.name || '未知药物'}</strong> - ${med.dosage || ''}，${med.timing || ''}
+                                <br><span style="color: #666; font-size: 14px;">${med.indication || ''}</span>
+                            </div>
+                        </div>`;
+                    });
+                    
+                    content += `</div>`;
+                }
+
+                return content;
+            } catch (error) {
+                console.error(`渲染 ${testType} 卡片内容时出错:`, error);
+                return `<div class="eve-note-item">⚠️ ${testType} 渲染失败: ${error.message}</div>`;
+            }
+        }
+
+        // 渲染过敏检测表格
+        function renderAllergyTable(testData) {
+            let tableContent = `<table class="eve-table">
+                <thead>
+                    <tr>
+                        <th>过敏原类别</th>
+                        <th>具体过敏原</th>
+                        <th>敏感度等级</th>
+                        <th>IgE值 (kU/L)</th>
+                        <th>季节性</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            testData.results.forEach(result => {
+                tableContent += `<tr>
+                    <td>${result.category}</td>
+                    <td>${result.allergen}</td>
+                    <td class="${result.isAllergic ? 'eve-status-abnormal' : 'eve-status-normal'}">${result.sensitivity}</td>
+                    <td class="${result.isAllergic ? 'eve-status-abnormal' : 'eve-status-normal'}">${result.igeValue}</td>
+                    <td>${result.season}</td>
+                </tr>`;
+            });
+
+            tableContent += `</tbody></table>`;
+            return tableContent;
+        }
+
+        // 渲染标准检测表格
+        function renderStandardTable(testData) {
+            let tableContent = `<table class="eve-table">
+                <thead>
+                    <tr>
+                        <th>检验项目</th>
+                        <th>检验结果</th>`;
+            
+            // 根据数据动态添加列
+            if (testData.results[0]?.unit !== undefined) {
+                tableContent += `<th>单位</th>`;
+            }
+            
+            tableContent += `<th>状态</th>
+                        <th>参考范围</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            testData.results.forEach(result => {
+                tableContent += `<tr>
+                    <td>${result.name}</td>
+                    <td class="${result.isNormal ? 'eve-status-normal' : 'eve-status-abnormal'}">${result.value}</td>`;
+                
+                if (result.unit !== undefined) {
+                    tableContent += `<td>${result.unit}</td>`;
+                }
+                
+                tableContent += `<td class="${result.isNormal ? 'eve-status-normal' : 'eve-status-abnormal'}">${result.status}</td>
+                    <td>${result.reference}</td>
+                </tr>`;
+            });
+
+            tableContent += `</tbody></table>`;
+            return tableContent;
+        }
+
+        // 渲染图表
+        function renderChart() {
+            try {
+                // 只有甲状腺检测才显示图表
+                if (!testsData.thyroid || !configData.availableTests.thyroid?.hasChart) {
+                    // 查找图表卡片并隐藏
+                    const chartCard = document.querySelector('#thyroidChart')?.closest('.eve-card');
+                    if (chartCard) {
+                        chartCard.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const chartElement = document.getElementById('thyroidChart');
+                if (!chartElement) {
+                    console.error('找不到thyroidChart元素');
+                    return;
+                }
+
+                const ctx = chartElement.getContext('2d');
+                const thyroidData = testsData.thyroid;
+                
+                if (!thyroidData.trendData || !thyroidData.trendData.datasets) {
+                    console.warn('甲状腺数据中缺少趋势图数据');
+                    return;
+                }
+                
+                const datasets = thyroidData.trendData.datasets.map(dataset => ({
+                    label: dataset.name,
+                    data: dataset.data,
+                    borderColor: dataset.color,
+                    backgroundColor: `${dataset.color}20`,
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: dataset.color,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }));
+                
+                const thyroidChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: thyroidData.trendData.labels,
+                        datasets: datasets
+                    },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '甲状腺功能指标变化趋势',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#2d3436',
+                            padding: 20
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#2d3436',
+                            bodyColor: '#2d3436',
+                            borderColor: '#fd79a8',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '数值',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3436'
+                            },
+                            grid: {
+                                color: 'rgba(253, 121, 168, 0.1)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#636e72'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '检查日期',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3436'
+                            },
+                            grid: {
+                                color: 'rgba(253, 121, 168, 0.1)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#636e72'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+            } catch (error) {
+                console.error('渲染图表时出错:', error);
+            }
+        }
+
+        // 渲染建议部分
+        function renderRecommendations() {
+            try {
+                // 更安全地查找建议卡片
+                const container = document.querySelector('.eve-container');
+                if (!container) {
+                    console.error('找不到eve-container元素');
+                    return;
+                }
+
+                const cards = container.querySelectorAll('.eve-card');
+                let recommendationsCard = null;
+
+                // 查找建议卡片 - 应该是倒数第二个卡片（最后一个是footer-info）
+                if (cards.length >= 2) {
+                    recommendationsCard = cards[cards.length - 1]; // 最后一个卡片
+                    
+                    // 如果最后一个卡片没有内容或者只是占位符，使用倒数第二个
+                    if (!recommendationsCard.innerHTML.trim() || recommendationsCard.innerHTML.includes('通过JavaScript动态加载')) {
+                        recommendationsCard = cards[cards.length - 2];
+                    }
+                }
+
+                if (!recommendationsCard) {
+                    console.error('找不到建议卡片');
+                    return;
+                }
+                
+                let content = `<h3 class="notes-title">医生建议与注意事项</h3>`;
+
+                // 为每个检测类型生成建议
+                configData.activeTests.forEach((testType, index) => {
+                    const testData = testsData[testType];
+                    const testConfig = configData.availableTests[testType];
+                    
+                    // 检查testData是否存在以及是否有recommendations
+                    if (!testData || !testData.recommendations) {
+                        console.warn(`缺少 ${testType} 的建议数据`);
+                        return;
+                    }
+                    
+                    content += `<div style="margin-bottom: ${index === configData.activeTests.length - 1 ? '20px' : '25px'};">
+                        <h4 style="color: ${testData.diagnosis?.color || '#666'}; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                            <span>${testData.diagnosis?.icon || '📋'}</span> ${testData.diagnosis?.name || testType}管理
+                        </h4>
+                        
+                        <div class="eve-note-item">
+                            <strong>🩺 诊断说明：</strong> ${testData.recommendations.diagnosis || '暂无诊断说明'}
+                        </div>
+                        
+                        <div class="eve-note-item">
+                            <strong>💊 治疗方案：</strong> ${testData.recommendations.treatment || '暂无治疗方案'}
+                        </div>`;
+
+                    // 检查lifestyle数组是否存在
+                    if (testData.recommendations.lifestyle && Array.isArray(testData.recommendations.lifestyle) && testData.recommendations.lifestyle.length > 0) {
+                        content += `<div class="eve-note-item">
+                            <strong>🥗 生活建议：</strong> 
+                            <ul style="margin: 10px 0; padding-left: 20px;">`;
+
+                        testData.recommendations.lifestyle.forEach(item => {
+                            content += `<li>${item}</li>`;
+                        });
+
+                        content += `</ul>
+                        </div>`;
+                    }
+
+                    // 过敏检测的特殊建议
+                    if (testType === 'allergy' && testData.recommendations.seasonalProtection) {
+                        content += `<div class="eve-note-item">
+                            <strong>🌸 过敏季节防护：</strong> ${testData.recommendations.seasonalProtection}
+                        </div>
+                        
+                        <div class="eve-note-item">
+                            <strong>💊 用药指导：</strong> ${testData.recommendations.medicationGuidance || '暂无用药指导'}
+                        </div>`;
+
+                        // 检查environmentalManagement数组是否存在
+                        if (testData.recommendations.environmentalManagement && Array.isArray(testData.recommendations.environmentalManagement)) {
+                            content += `<div class="eve-note-item">
+                                <strong>🏡 环境管理：</strong> 
+                                <ul style="margin: 10px 0; padding-left: 20px;">`;
+
+                            testData.recommendations.environmentalManagement.forEach(item => {
+                                content += `<li>${item}</li>`;
+                            });
+
+                            content += `</ul>
+                            </div>`;
+                        }
+                        
+                        if (testData.recommendations.symptoms) {
+                            content += `<div class="eve-note-item">
+                                <strong>⚠️ 注意症状：</strong> ${testData.recommendations.symptoms}
+                            </div>`;
+                        }
+                    }
+
+                    // 血液检测的特殊建议
+                    if (testType === 'blood' && testData.recommendations.donationNotes) {
+                        content += `<div class="eve-note-item" style="background: rgba(231, 76, 60, 0.1); border-left-color: #e74c3c;">
+                            <strong>🩸 提醒：</strong> ${testData.recommendations.donationNotes}
+                        </div>`;
+                    }
+
+                    content += `</div>`;
+                });
+                
+                content += `<div class="eve-note-item" style="margin-top: 20px; background: rgba(253, 121, 168, 0.1); border-left-color: #fd79a8;">
+                    <strong>🔄 复查建议：</strong> ${configData.generalNotes || '请根据医生建议定期复查各项指标。'}
+                </div>`;
+
+                recommendationsCard.innerHTML = content;
+            } catch (error) {
+                console.error('渲染建议部分时出错:', error);
+            }
+        }
+
+        // 页面加载完成后加载数据
+        window.addEventListener('load', function() {
+            loadData();
+        });
+
+        // 返回顶部按钮功能
+        window.addEventListener('scroll', function() {
+            const backToTopBtn = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 添加表格行的悬停效果
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelectorAll('.eve-table tbody tr').forEach(row => {
+                    row.addEventListener('mouseenter', function() {
+                        this.style.transform = 'scale(1.02)';
+                        this.style.transition = 'transform 0.2s ease';
+                    });
+                    
+                    row.addEventListener('mouseleave', function() {
+                        this.style.transform = 'scale(1)';
+                    });
+                });
+            }, 1000);
+        });
+    </script></body></html>
